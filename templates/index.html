@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Cyber Network Connectivity & Security Analyzer
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- CURSOR GLOW -->
+    <div class="cursor-glow"></div>
+
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+
+        <div class="logo">
+            <span class="logo-icon">◈</span>
+            CYBER<span>NET</span>
+        </div>
+
+        <div class="nav-title">
+            Network Connectivity & Security Analyzer
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            SYSTEM ONLINE
+        </div>
+
+    </nav>
+
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <div class="small-title">
+                DISCRETE MATHEMATICS PROJECT
+            </div>
+
+            <h1>
+                CYBER NETWORK
+                <span>ANALYZER</span>
+            </h1>
+
+            <p>
+                Analyze network connectivity, device relationships,
+                shortest paths, critical devices and basic security
+                conditions using Graph Theory and Logic.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- MAIN CONTAINER -->
+    <main class="container">
+
+
+        <!-- INPUT SECTION -->
+        <section class="panel">
+
+            <div class="panel-heading">
+
+                <div>
+                    <div class="section-number">01</div>
+
+                    <h2>
+                        NETWORK INPUT
+                    </h2>
+
+                    <p>
+                        Enter devices and their connections.
+                    </p>
+                </div>
+
+                <div class="panel-icon">
+                    NETWORK
+                </div>
+
+            </div>
+
+
+            <form method="POST">
+
+
+                <div class="input-grid">
+
+
+                    <!-- DEVICES -->
+                    <div class="input-card">
+
+                        <label>
+                            DEVICES
+                        </label>
+
+                        <span class="input-hint">
+                            One device per line
+                        </span>
+
+                        <textarea
+                            name="devices"
+                            placeholder="PC1
+PC2
+Router
+Server"
+                            required>{{ request.form.get('devices', '') }}</textarea>
+
+                    </div>
+
+
+                    <!-- CONNECTIONS -->
+                    <div class="input-card">
+
+                        <label>
+                            CONNECTIONS
+                        </label>
+
+                        <span class="input-hint">
+                            Format: Device1,Device2,yes/no
+                        </span>
+
+                        <textarea
+                            name="connections"
+                            placeholder="PC1,Router,yes
+PC2,Router,yes
+Router,Server,yes"
+                            required>{{ request.form.get('connections', '') }}</textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PATH INPUT -->
+                <div class="path-inputs">
+
+                    <div class="input-card">
+
+                        <label>
+                            START DEVICE
+                        </label>
+
+                        <input
+                            type="text"
+                            name="start"
+                            placeholder="PC1"
+                            value="{{ request.form.get('start', '') }}">
+
+                    </div>
+
+
+                    <div class="path-arrow">
+                        →
+                    </div>
+
+
+                    <div class="input-card">
+
+                        <label>
+                            DESTINATION DEVICE
+                        </label>
+
+                        <input
+                            type="text"
+                            name="destination"
+                            placeholder="Server"
+                            value="{{ request.form.get('destination', '') }}">
+
+                    </div>
+
+                </div>
+
+
+                <!-- BUTTON -->
+                <button
+                    type="submit"
+                    class="analyze-button">
+
+                    <span>
+                        ANALYZE NETWORK
+                    </span>
+
+                    <span class="button-arrow">
+                        →
+                    </span>
+
+                </button>
+
+            </form>
+
+        </section>
+
+
+
+        {% if result %}
+
+        <!-- RESULTS -->
+        <section class="results-section">
+
+
+            <div class="results-heading">
+
+                <div>
+                    <div class="section-number">
+                        02
+                    </div>
+
+                    <h2>
+                        NETWORK ANALYSIS
+                    </h2>
+                </div>
+
+                <div class="analysis-line"></div>
+
+            </div>
+
+
+
+            <!-- STAT CARDS -->
+            <div class="stats-grid">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-label">
+                        TOTAL DEVICES
+                    </div>
+
+                    <div class="stat-value">
+                        {{ result.total_devices }}
+                    </div>
+
+                    <div class="stat-symbol">
+                        NODE
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-label">
+                        CONNECTIONS
+                    </div>
+
+                    <div class="stat-value">
+                        {{ result.total_connections }}
+                    </div>
+
+                    <div class="stat-symbol">
+                        EDGE
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-label">
+                        CONNECTIVITY
+                    </div>
+
+                    <div class="stat-value small-value
+                        {% if result.is_connected %}
+                            safe-text
+                        {% else %}
+                            warning-text
+                        {% endif %}">
+
+                        {% if result.is_connected %}
+                            CONNECTED
+                        {% else %}
+                            DISCONNECTED
+                        {% endif %}
+
+                    </div>
+
+                    <div class="stat-symbol">
+                        GRAPH
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-label">
+                        SECURITY
+                    </div>
+
+                    <div class="stat-value small-value
+                        {% if result.security_status == 'SAFE' %}
+                            safe-text
+                        {% else %}
+                            warning-text
+                        {% endif %}">
+
+                        {{ result.security_status }}
+
+                    </div>
+
+                    <div class="stat-symbol">
+                        LOGIC
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ANALYSIS GRID -->
+            <div class="analysis-grid">
+
+
+                <!-- DEVICE DEGREE -->
+                <div class="analysis-card">
+
+                    <div class="card-title">
+
+                        <span class="card-number">
+                            A
+                        </span>
+
+                        DEVICE DEGREE
+
+                    </div>
+
+                    <p class="card-description">
+                        Number of connections for each device.
+                    </p>
+
+
+                    <div class="device-list">
+
+                        {% for device, degree in result.degrees.items() %}
+
+                        <div class="device-row">
+
+                            <span>
+                                {{ device }}
+                            </span>
+
+                            <span class="degree">
+                                {{ degree }}
+                            </span>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CRITICAL DEVICE -->
+                <div class="analysis-card">
+
+                    <div class="card-title">
+
+                        <span class="card-number">
+                            B
+                        </span>
+
+                        CRITICAL DEVICE
+
+                    </div>
+
+                    <p class="card-description">
+                        Device with the highest degree.
+                    </p>
+
+
+                    <div class="critical-box">
+
+                        {% if result.critical_devices %}
+
+                            {% for device in result.critical_devices %}
+
+                            <div class="critical-device">
+
+                                <span class="critical-icon">
+                                    ◉
+                                </span>
+
+                                {{ device }}
+
+                            </div>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <span>
+                                No critical device
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- SHORTEST PATH -->
+                <div class="analysis-card path-card">
+
+                    <div class="card-title">
+
+                        <span class="card-number">
+                            C
+                        </span>
+
+                        SHORTEST PATH
+
+                    </div>
+
+                    <p class="card-description">
+                        Shortest route between selected devices.
+                    </p>
+
+
+                    <div class="path-result">
+
+                        {% if result.path %}
+
+                            {% for device in result.path %}
+
+                                <span class="path-node">
+                                    {{ device }}
+                                </span>
+
+                                {% if not loop.last %}
+                                    <span class="path-line">
+                                        →
+                                    </span>
+                                {% endif %}
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <span class="no-path">
+                                No path found
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- SECURITY -->
+                <div class="analysis-card security-card">
+
+                    <div class="card-title">
+
+                        <span class="card-number">
+                            D
+                        </span>
+
+                        SECURITY ANALYSIS
+
+                    </div>
+
+                    <p class="card-description">
+                        Basic Boolean and logical security rules.
+                    </p>
+
+
+                    <div class="security-result
+                        {% if result.security_status == 'SAFE' %}
+                            safe-box
+                        {% else %}
+                            warning-box
+                        {% endif %}">
+
+                        {% if result.security_status == "SAFE" %}
+
+                            <div class="security-icon">
+                                ✓
+                            </div>
+
+                            <div>
+                                <strong>
+                                    NETWORK SAFE
+                                </strong>
+
+                                <p>
+                                    All entered connections
+                                    are authorized.
+                                </p>
+                            </div>
+
+                        {% else %}
+
+                            <div class="security-icon">
+                                !
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    SECURITY WARNING
+                                </strong>
+
+                                {% for warning in result.security_warnings %}
+
+                                <p>
+                                    {{ warning }}
+                                </p>
+
+                                {% endfor %}
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- GRAPH VISUALIZATION -->
+            <section class="graph-section">
+
+                <div class="card-title">
+
+                    <span class="card-number">
+                        E
+                    </span>
+
+                    NETWORK GRAPH
+
+                </div>
+
+                <p class="card-description">
+                    Devices are represented as vertices and
+                    connections as edges.
+                </p>
+
+
+                <div class="graph-container">
+
+                    {% for device, neighbors in result.graph.items() %}
+
+                    <div class="graph-node">
+
+                        <div class="node-circle">
+                            {{ loop.index }}
+                        </div>
+
+                        <div class="node-name">
+                            {{ device }}
+                        </div>
+
+                        <div class="node-connections">
+
+                            {% if neighbors %}
+
+                                {% for neighbor in neighbors %}
+                                    {{ neighbor }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+
+                            {% else %}
+
+                                No connections
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+            </section>
+
+
+
+            <!-- DISCRETE MATHEMATICS -->
+            <section class="dm-section">
+
+                <div class="dm-title">
+                    DISCRETE MATHEMATICS USED
+                </div>
+
+                <div class="dm-tags">
+
+                    <span>GRAPH THEORY</span>
+                    <span>SETS</span>
+                    <span>RELATIONS</span>
+                    <span>CONNECTIVITY</span>
+                    <span>DEGREE OF VERTEX</span>
+                    <span>BFS</span>
+                    <span>SHORTEST PATH</span>
+                    <span>BOOLEAN LOGIC</span>
+
+                </div>
+
+            </section>
+
+
+        </section>
+
+        {% endif %}
+
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer>
+
+        <div>
+            CYBER NETWORK CONNECTIVITY & SECURITY ANALYZER
+        </div>
+
+        <div>
+            DISCRETE MATHEMATICS PROJECT
+        </div>
+
+    </footer>
+
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+
+</html>
